@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+ import hospitalLogo from "../../assets/bcmch-logo.png";
 import { LayoutDashboard, Users, PlusCircle, Settings, LogOut, Bell, User as UserIcon, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -12,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,7 +24,6 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     { name: 'Patients', href: '/admin/patients', icon: Users },
     { name: 'Add Patient', href: '/admin/patients/new', icon: PlusCircle },
     { name: 'User Management', href: '/admin/users', icon: UserPlus },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   const handleLogout = () => {
@@ -35,9 +36,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Sidebar */}
       <aside className="w-[280px] bg-white border-r border-slate-200 flex flex-col shadow-sm hidden md:flex">
         <div className="h-16 flex items-center px-6 border-b border-slate-100">
-          <div className="w-8 h-8 rounded bg-brand flex items-center justify-center text-white font-bold mr-3">
-            +
-          </div>
+          
           <span className="font-bold text-lg text-slate-800">Believers Hospital</span>
         </div>
         
@@ -77,7 +76,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm">
           <div className="md:hidden font-bold text-lg text-slate-800">Believers Hospital</div>
-          <div className="hidden md:block text-slate-600 font-medium">Admin Control System</div>
+          <div className="hidden md:block text-slate-600 font-medium">Patient Control System</div>
           
           <div className="flex items-center gap-4">
             <button className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors relative">
@@ -109,10 +108,6 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                   <DropdownMenuItem>
                     <UserIcon className="mr-2 h-4 w-4" />
                     <span>My Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Change Password</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:bg-red-50 focus:text-red-600">

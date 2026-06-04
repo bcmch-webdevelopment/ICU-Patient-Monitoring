@@ -22,6 +22,22 @@ const RequireAuth = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
+const RequireAdmin = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
+  if (user?.designation !== 'Administrator') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return children;
+};
+
 export const AppRouter = () => {
   return (
     <BrowserRouter>
@@ -31,17 +47,17 @@ export const AppRouter = () => {
 
         {/* Auth Route */}
         <Route path="/admin/login" element={<Login />} />
-        <Route path="/admin/registration" element={<Registration />} />
-
         {/* Admin Routes */}
         <Route path="/admin" element={<RequireAuth><Outlet /></RequireAuth>}>
           <Route index element={<Dashboard />} />
           <Route path="patients" element={<PatientsList />} />
           <Route path="patients/new" element={<PatientCreate />} />
           <Route path="patients/edit/:id" element={<PatientEdit />} />
-          <Route path="users/create" element={<UserCreate />} />
-          <Route path="users" element={<UserManagement />} />
-          <Route path="settings" element={<Navigate to="/admin" />} />
+          
+          {/* Admin-only Routes */}
+          <Route path="registration" element={<RequireAdmin><Registration /></RequireAdmin>} />
+          <Route path="users/create" element={<RequireAdmin><UserCreate /></RequireAdmin>} />
+          <Route path="users" element={<RequireAdmin><UserManagement /></RequireAdmin>} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" />} />

@@ -91,7 +91,7 @@ export const PatientForm = ({ initialData, onSubmit, onCancel, isLoading }: Pati
               <FormItem>
                 <FormLabel>UHID</FormLabel>
                 <FormControl>
-                  <Input placeholder="UHID-001" {...field} />
+                  <Input placeholder="123456789" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
