@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Trash } from 'lucide-react';
+import { Edit, Trash, Power } from 'lucide-react';
 
 interface User {
   id: string;
+  fullName: string;
   username: string;
   designation: string;
   status: string;
@@ -22,6 +23,7 @@ export default function UserManagement() {
   const { toast } = useToast();
 
   // Create User Form State
+  const [newFullName, setNewFullName] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,6 +32,7 @@ export default function UserManagement() {
 
   // Edit User Modal State
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editFullName, setEditFullName] = useState('');
   const [editUsername, setEditUsername] = useState('');
   const [editPassword, setEditPassword] = useState('');
   const [editDesignation, setEditDesignation] = useState('');
@@ -59,7 +62,7 @@ export default function UserManagement() {
       toast({ title: 'Validation Error', description: 'Passwords do not match', variant: 'destructive' });
       return;
     }
-    if (!newUsername || !newPassword || !newDesignation) {
+    if (!newFullName || !newUsername || !newPassword || !newDesignation) {
       toast({ title: 'Validation Error', description: 'Please fill all required fields', variant: 'destructive' });
       return;
     }
@@ -68,11 +71,12 @@ export default function UserManagement() {
       const res = await fetch('http://localhost:5000/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: newUsername, password: newPassword, designation: newDesignation, status: newStatus })
+        body: JSON.stringify({ fullName: newFullName, username: newUsername, password: newPassword, designation: newDesignation, status: newStatus })
       });
       
       if (res.ok) {
         toast({ title: 'Success', description: 'User created successfully' });
+        setNewFullName('');
         setNewUsername('');
         setNewPassword('');
         setConfirmPassword('');
@@ -90,6 +94,7 @@ export default function UserManagement() {
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
+    setEditFullName(user.fullName);
     setEditUsername(user.username);
     setEditDesignation(user.designation);
     setEditStatus(user.status);
@@ -99,7 +104,7 @@ export default function UserManagement() {
   const submitEditUser = async () => {
     if (!editingUser) return;
     try {
-      const payload: any = { username: editUsername, designation: editDesignation, status: editStatus };
+      const payload: any = { fullName: editFullName, username: editUsername, designation: editDesignation, status: editStatus };
       if (editPassword) payload.password = editPassword;
 
       const res = await fetch(`http://localhost:5000/api/users/${editingUser.id}`, {
@@ -135,6 +140,33 @@ export default function UserManagement() {
     }
   };
 
+  const handleToggleStatus = async (user: User) => {
+    try {
+      const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
+      const payload: any = { 
+        fullName: user.fullName, 
+        username: user.username, 
+        designation: user.designation, 
+        status: newStatus 
+      };
+
+      const res = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        toast({ title: 'Success', description: `User ${newStatus.toLowerCase()}d successfully` });
+        fetchUsers();
+      } else {
+        const err = await res.json();
+        toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      }
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to update user status', variant: 'destructive' });
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -149,6 +181,10 @@ export default function UserManagement() {
           </CardHeader>
           <CardContent className="pt-6">
             <form onSubmit={handleCreateUser} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full Name *</Label>
+                <Input id="fullName" value={newFullName} onChange={(e) => setNewFullName(e.target.value)} required />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="username">Username *</Label>
                 <Input id="username" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} required />
@@ -200,6 +236,7 @@ export default function UserManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Full Name</TableHead>
                   <TableHead>Username</TableHead>
                   <TableHead>Designation</TableHead>
                   <TableHead>Status</TableHead>
@@ -210,12 +247,13 @@ export default function UserManagement() {
               <TableBody>
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-4 text-slate-500">No users found.</TableCell>
+                    <TableCell colSpan={6} className="text-center py-4 text-slate-500">No users found.</TableCell>
                   </TableRow>
                 ) : (
                   users.map(user => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.username}</TableCell>
+                      <TableCell className="font-medium">{user.fullName}</TableCell>
+                      <TableCell>{user.username}</TableCell>
                       <TableCell>{user.designation}</TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${user.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-brand'}`}>
@@ -224,10 +262,13 @@ export default function UserManagement() {
                       </TableCell>
                       <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => handleEditUser(user)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(user)} title={user.status === 'Active' ? 'Deactivate' : 'Activate'}>
+                          <Power className={`h-4 w-4 ${user.status === 'Active' ? 'text-slate-500' : 'text-green-600'}`} />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleEditUser(user)} title="Edit">
                           <Edit className="h-4 w-4 text-slate-500" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteUser(user.id)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteUser(user.id)} title="Delete">
                           <Trash className="h-4 w-4 text-brand" />
                         </Button>
                       </TableCell>
@@ -247,6 +288,10 @@ export default function UserManagement() {
             <DialogTitle>Edit User Account</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="editFullName">Full Name</Label>
+              <Input id="editFullName" value={editFullName} onChange={(e) => setEditFullName(e.target.value)} />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="editUsername">Username</Label>
               <Input id="editUsername" value={editUsername} onChange={(e) => setEditUsername(e.target.value)} />

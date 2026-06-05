@@ -307,6 +307,37 @@ app.post('/api/auth/login', (req, res) => {
     }
   });
 });
+app.post('/api/auth/change-password', async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body;
+  const db = getDB();
+
+  db.get('SELECT * FROM users WHERE id = ?', [userId], async (err, user: any) => {
+    if (err) {
+      res.status(500).json({ message: 'Database error' });
+    } else if (!user) {
+      res.status(404).json({ message: 'User not found' });
+    } else {
+      const match = await bcrypt.compare(currentPassword, user.password_hash);
+      if (match) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        db.run(
+          'UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+          [hashedPassword, userId],
+          function (err) {
+            if (err) {
+              res.status(500).json({ message: 'Database error' });
+            } else {
+              res.json({ message: 'Password updated successfully' });
+            }
+          }
+        );
+      } else {
+        res.status(401).json({ message: 'Incorrect current password' });
+      }
+    }
+  });
+});
 
 app.get('/api/users', (req, res) => {
   const db = getDB();

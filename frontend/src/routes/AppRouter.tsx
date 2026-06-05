@@ -8,6 +8,7 @@ import PatientCreate from '@/pages/admin/PatientCreate';
 import PatientEdit from '@/pages/admin/PatientEdit';
 import UserCreate from '@/pages/admin/UserCreate';
 import UserManagement from '@/pages/admin/UserManagement';
+import ChangePassword from '@/pages/auth/ChangePassword';
 import { Toaster } from '@/components/ui/toaster';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -58,6 +59,9 @@ export const AppRouter = () => {
           <Route path="registration" element={<RequireAdmin><Registration /></RequireAdmin>} />
           <Route path="users/create" element={<RequireAdmin><UserCreate /></RequireAdmin>} />
           <Route path="users" element={<RequireAdmin><UserManagement /></RequireAdmin>} />
+          
+          {/* Authenticated Routes */}
+          <Route path="change-password" element={<ChangePassword />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" />} />
