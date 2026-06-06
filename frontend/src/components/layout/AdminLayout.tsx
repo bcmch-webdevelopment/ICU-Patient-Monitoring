@@ -19,12 +19,18 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
 
-  const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  const baseNavigation = [
     { name: 'Patients', href: '/admin/patients', icon: Users },
     { name: 'Add Patient', href: '/admin/patients/new', icon: PlusCircle },
+  ];
+
+  const adminNavigation = [
+    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    ...baseNavigation,
     { name: 'User Management', href: '/admin/users', icon: UserPlus },
   ];
+
+  const navigation = user?.designation === 'Administrator' ? adminNavigation : baseNavigation;
 
   const handleLogout = () => {
     logout();
@@ -105,9 +111,14 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/admin/profile')}>
                     <UserIcon className="mr-2 h-4 w-4" />
                     <span>My Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/admin/change-password')}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Change Password</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:bg-red-50 focus:text-red-600">

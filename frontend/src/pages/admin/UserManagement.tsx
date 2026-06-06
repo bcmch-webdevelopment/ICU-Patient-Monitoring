@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -168,7 +169,8 @@ export default function UserManagement() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <AdminLayout>
+      <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight text-brand">User Management</h1>
       </div>
@@ -333,5 +335,6 @@ export default function UserManagement() {
         </DialogContent>
       </Dialog>
     </div>
+    </AdminLayout>
   );
 }

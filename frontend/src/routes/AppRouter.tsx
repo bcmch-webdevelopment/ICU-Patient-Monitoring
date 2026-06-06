@@ -8,6 +8,7 @@ import PatientCreate from '@/pages/admin/PatientCreate';
 import PatientEdit from '@/pages/admin/PatientEdit';
 import UserCreate from '@/pages/admin/UserCreate';
 import UserManagement from '@/pages/admin/UserManagement';
+import MyProfile from '@/pages/admin/MyProfile';
 import ChangePassword from '@/pages/auth/ChangePassword';
 import { Toaster } from '@/components/ui/toaster';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -33,7 +34,7 @@ const RequireAdmin = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (user?.designation !== 'Administrator') {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to="/admin/patients" replace />;
   }
 
   return children;
@@ -50,7 +51,7 @@ export const AppRouter = () => {
         <Route path="/admin/login" element={<Login />} />
         {/* Admin Routes */}
         <Route path="/admin" element={<RequireAuth><Outlet /></RequireAuth>}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<RequireAdmin><Dashboard /></RequireAdmin>} />
           <Route path="patients" element={<PatientsList />} />
           <Route path="patients/new" element={<PatientCreate />} />
           <Route path="patients/edit/:id" element={<PatientEdit />} />
@@ -61,6 +62,7 @@ export const AppRouter = () => {
           <Route path="users" element={<RequireAdmin><UserManagement /></RequireAdmin>} />
           
           {/* Authenticated Routes */}
+          <Route path="profile" element={<MyProfile />} />
           <Route path="change-password" element={<ChangePassword />} />
         </Route>
 

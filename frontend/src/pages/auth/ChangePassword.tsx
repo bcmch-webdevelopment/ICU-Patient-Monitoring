@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,7 +55,8 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="p-6 h-[calc(100vh-64px)] flex items-center justify-center">
+    <AdminLayout>
+      <div className="p-6 h-[calc(100vh-64px)] flex items-center justify-center">
       <Card className="w-full max-w-md shadow-lg border-t-4 border-t-brand">
         <CardHeader className="space-y-1 bg-slate-50 border-b">
           <CardTitle className="text-2xl font-bold text-center text-brand">Change Password</CardTitle>
@@ -101,5 +103,6 @@ export default function ChangePassword() {
         </CardContent>
       </Card>
     </div>
+    </AdminLayout>
   );
 }
